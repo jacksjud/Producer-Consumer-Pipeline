@@ -88,7 +88,6 @@ void* inputThread(void * arg);     // stdin -> inputThread (producer) -> separat
 void* separatorThread(void * arg); // separatorThread (producer) -> replaceThread (consumer)
 void* replaceThread(void * arg);   // replaceThread (producer) -> outputThread (consumer)
 void* outputThread(void * arg);    // outputThread -> stdout
-
 char* replaceLine(char *line);
 
 int main(){
@@ -121,6 +120,16 @@ int main(){
     return 0;
 }
 
+/* ----------------------------------------
+    Function: inputThread
+===========================================
+    Desc: Retrieves lines from stdin and 
+    writes them to Buffer 1. If stop the
+    stop command is given it sets the stop
+    flag to -1 (usually 0) and breaks.
+
+    Params:
+---------------------------------------- */
 void* inputThread(void * arg){
     // Input as big as it can get
     char inputLine[MAX_LINE];
@@ -153,7 +162,9 @@ void* inputThread(void * arg){
 ===========================================
     Desc: Retrieves lines from Buffer 1 and
     replaces newline characters with spaces.
-    Stores the modified lines in Buffer 2
+    Stores the modified lines in Buffer 2.
+    Stops if stop flag is set and buffer is
+    empty (job done).
 
     Params:
 ---------------------------------------- */
@@ -208,7 +219,8 @@ void* separatorThread(void * arg){
 ===========================================
     Desc: Retrieves lines from Buffer 2 and
     replaces "++" with "^". Stores modified
-    lines in Buffer 3.
+    lines in Buffer 3. Stops if stop flag
+    is set and buffer is empty (job done)
 
     Params:
 ---------------------------------------- */
@@ -255,15 +267,12 @@ void* replaceThread(void * arg){
 /* ----------------------------------------
     Function: replaceLine
 ===========================================
-    Desc: Takes pointer, token, and 
-    replaces the location specified by the 
-    substring pointer with the pid. It 
-    checks for multiple occurances.
+    Desc: Takes pointer, line, and replaces
+    all instances of "++" with the 
+    character '^'.
 
     Params:
-    token: char * , string to change.
-    substring: char * , part of string to 
-    change
+    line: char * , line to check/change
 ---------------------------------------- */
 char* replaceLine(char *line){
     char * pos; 
@@ -278,7 +287,8 @@ char* replaceLine(char *line){
 ===========================================
     Desc: Retrieves lines from Buffer 3 and
     writes lines of exactly 80 characters
-    to standard output.
+    to standard output. Stops if stop flag
+    is set and buffer is empty (job done)
 
     Params:
 ---------------------------------------- */
